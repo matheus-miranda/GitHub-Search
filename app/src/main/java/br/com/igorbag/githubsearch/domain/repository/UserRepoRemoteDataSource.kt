@@ -5,5 +5,5 @@ import br.com.igorbag.githubsearch.domain.model.UserRepo
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepoRemoteDataSource {
-    fun fetchRepoList(): Flow<ResultStatus<List<UserRepo>>>
+    fun fetchRepoList(username: String): Flow<ResultStatus<List<UserRepo>>>
 }
