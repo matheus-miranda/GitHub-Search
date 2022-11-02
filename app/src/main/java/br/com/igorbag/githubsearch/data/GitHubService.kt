@@ -1,13 +1,12 @@
 package br.com.igorbag.githubsearch.data
 
 import br.com.igorbag.githubsearch.domain.model.UserRepo
-import retrofit2.Call
+import kotlinx.coroutines.flow.Flow
 import retrofit2.http.GET
 import retrofit2.http.Path
 
 interface GitHubService {
 
-    @GET("users/{user}/repos")
-    fun getAllRepositoriesByUser(@Path("user") user: String): Call<List<UserRepo>>
-
+    @GET("users/{username}/repos")
+    fun getAllRepositoriesByUser(@Path("username") user: String): Flow<List<UserRepo>>
 }
