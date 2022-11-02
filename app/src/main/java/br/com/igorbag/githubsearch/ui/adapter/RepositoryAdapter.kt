@@ -5,13 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import br.com.igorbag.githubsearch.R
-import br.com.igorbag.githubsearch.domain.Repository
+import br.com.igorbag.githubsearch.domain.model.UserRepo
 
-class RepositoryAdapter(private val repositories: List<Repository>) :
+class RepositoryAdapter(private val repositories: List<UserRepo>) :
     RecyclerView.Adapter<RepositoryAdapter.ViewHolder>() {
 
-    var carItemLister: (Repository) -> Unit = {}
-    var btnShareLister: (Repository) -> Unit = {}
+    var carItemLister: (UserRepo) -> Unit = {}
+    var btnShareLister: (UserRepo) -> Unit = {}
 
     // Cria uma nova view
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

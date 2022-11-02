@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import br.com.igorbag.githubsearch.R
 import br.com.igorbag.githubsearch.data.GitHubService
-import br.com.igorbag.githubsearch.domain.Repository
+import br.com.igorbag.githubsearch.domain.model.UserRepo
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Metodo responsavel por realizar a configuracao do adapter
-    fun setupAdapter(list: List<Repository>) {
+    fun setupAdapter(list: List<UserRepo>) {
         /*
             @TODO 7 - Implementar a configuracao do Adapter , construir o adapter e instancia-lo
             passando a listagem dos repositorios
