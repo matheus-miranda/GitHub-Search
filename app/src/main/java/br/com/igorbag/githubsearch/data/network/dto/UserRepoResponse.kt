@@ -1,4 +1,4 @@
-package br.com.igorbag.githubsearch.data.remote.dto
+package br.com.igorbag.githubsearch.data.network.dto
 
 import br.com.igorbag.githubsearch.domain.model.UserRepo
 import com.google.gson.annotations.SerializedName

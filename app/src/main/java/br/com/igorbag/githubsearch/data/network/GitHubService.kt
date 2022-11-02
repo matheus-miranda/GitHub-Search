@@ -1,4 +1,4 @@
-package br.com.igorbag.githubsearch.data
+package br.com.igorbag.githubsearch.data.network
 
 import br.com.igorbag.githubsearch.domain.model.UserRepo
 import kotlinx.coroutines.flow.Flow

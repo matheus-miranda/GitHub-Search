@@ -8,7 +8,7 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import br.com.igorbag.githubsearch.R
-import br.com.igorbag.githubsearch.data.GitHubService
+import br.com.igorbag.githubsearch.data.network.GitHubService
 import br.com.igorbag.githubsearch.domain.model.UserRepo
 
 class MainActivity : AppCompatActivity() {
