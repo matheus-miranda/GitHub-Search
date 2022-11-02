@@ -7,7 +7,7 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import javax.inject.Inject
 
-class ErrorHandleImpl @Inject constructor() : ErrorHandler {
+class ErrorHandlerImpl @Inject constructor() : ErrorHandler {
 
     override fun getError(throwable: Throwable): ErrorEntity {
         return when (throwable) {
