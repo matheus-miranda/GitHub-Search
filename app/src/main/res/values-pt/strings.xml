@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GitHub Search</string>
+    <string name="user_name">Nome do usuário</string>
+    <string name="confirm">Confirmar</string>
+    <string name="network_error_message">Por favor, verifique sua conexão com a internet</string>
+    <string name="user_not_found_message">Usuário não encontrado, por favor tente novamente</string>
+    <string name="service_unavailable_message">Serviço indisponível, por favor tente novamente mais tarde</string>
+    <string name="unknown_error_message">Estamos consertando o erro, por favor tente mais tarde</string>
+</resources>
