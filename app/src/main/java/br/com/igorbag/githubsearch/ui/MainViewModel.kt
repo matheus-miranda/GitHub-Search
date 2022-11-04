@@ -24,7 +24,10 @@ class MainViewModel @Inject constructor(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     private val _savedUserName = MutableStateFlow("")
-    val savedUserName: StateFlow<String> = _savedUserName
+    val savedUserName: StateFlow<String> = _savedUserName.asStateFlow()
+
+    private var _showSnackBar = MutableStateFlow(false)
+    val showSnackBar: StateFlow<Boolean> = _showSnackBar.asStateFlow()
 
     init {
         retrieveSavedUserName()
@@ -54,6 +57,14 @@ class MainViewModel @Inject constructor(
                 _savedUserName.value = it
             }
         }
+    }
+
+    fun doneShowingSnackBar() {
+        _showSnackBar.value = false
+    }
+
+    fun resetSnackBarValue() {
+        _showSnackBar.value = true
     }
 }
 

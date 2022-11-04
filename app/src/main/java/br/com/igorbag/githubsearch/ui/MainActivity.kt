@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
                 hideKeyboard(it)
                 binding.pbLoading.isVisible = true
             } else {
-                displayOnSnackBar(getString(R.string.enter_username))
+                binding.etUserName.error = getString(R.string.enter_username)
             }
         }
     }
@@ -87,8 +88,22 @@ class MainActivity : AppCompatActivity() {
             ErrorEntity.ServiceUnavailable -> R.string.service_unavailable_message
             ErrorEntity.Unknown -> R.string.unknown_error_message
         }
+        manageSnackBarStateAndShow(message)
+        viewModel.resetSnackBarValue()
         binding.pbLoading.isVisible = false
-        displayOnSnackBar(getString(message))
+    }
+
+    private fun manageSnackBarStateAndShow(@StringRes message: Int) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.showSnackBar.collect { shouldShowSnackBar ->
+                    if (shouldShowSnackBar) {
+                        displayOnSnackBar(getString(message))
+                        viewModel.doneShowingSnackBar()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupAdapter(list: List<UserRepo>) {
