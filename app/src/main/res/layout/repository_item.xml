@@ -27,9 +27,9 @@
 
             <ImageView
                 android:id="@+id/iv_favorite"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_margin="16dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/share_icon"
