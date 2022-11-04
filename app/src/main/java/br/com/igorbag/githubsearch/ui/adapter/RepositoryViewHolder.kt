@@ -8,8 +8,8 @@ import br.com.igorbag.githubsearch.domain.model.UserRepo
 
 class RepositoryViewHolder(
     binding: RepositoryItemBinding,
-    private val onShareClick: (UserRepo) -> Unit,
-    private val onCardClick: (UserRepo) -> Unit,
+    private val onShareClick: (String) -> Unit,
+    private val onCardClick: (String) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private val cvRepoCard = binding.cvCard
@@ -20,18 +20,18 @@ class RepositoryViewHolder(
         tvRepoName.text = userRepo.name
 
         ivFavorite.setOnClickListener {
-            onShareClick(userRepo)
+            onShareClick(userRepo.htmlUrl)
         }
         cvRepoCard.setOnClickListener {
-            onCardClick(userRepo)
+            onCardClick(userRepo.htmlUrl)
         }
     }
 
     companion object {
         fun create(
             parent: ViewGroup,
-            onShareClick: (UserRepo) -> Unit,
-            onCardClick: (UserRepo) -> Unit,
+            onShareClick: (String) -> Unit,
+            onCardClick: (String) -> Unit,
         ): RepositoryViewHolder {
             val inflater = LayoutInflater.from(parent.context)
             val itemBinding = RepositoryItemBinding.inflate(inflater, parent, false)

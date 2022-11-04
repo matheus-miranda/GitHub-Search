@@ -23,10 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel: MainViewModel by viewModels()
     private val repoAdapter by lazy {
-        RepositoryAdapter(
-            onShareClick = { shareRepositoryLink(it.htmlUrl) },
-            onCardClick = { openBrowser(it.htmlUrl) }
-        )
+        RepositoryAdapter(onShareClick = ::shareRepositoryLink, onCardClick = ::openBrowser)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             if (userName.isNotBlank()) {
                 viewModel.search(userName)
             } else {
-                Snackbar.make(binding.root, getString(R.string.enter_username), Snackbar.LENGTH_LONG).show()
+                displayOnSnackBar(getString(R.string.enter_username))
             }
         }
     }
@@ -80,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             ErrorEntity.ServiceUnavailable -> R.string.service_unavailable_message
             ErrorEntity.Unknown -> R.string.unknown_error_message
         }
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+        displayOnSnackBar(getString(message))
     }
 
     private fun setupAdapter(list: List<UserRepo>) {
@@ -109,5 +106,9 @@ class MainActivity : AppCompatActivity() {
                 Uri.parse(urlRepository)
             )
         )
+    }
+
+    private fun displayOnSnackBar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
 }

@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.ListAdapter
 import br.com.igorbag.githubsearch.domain.model.UserRepo
 
 class RepositoryAdapter(
-    private val onShareClick: (UserRepo) -> Unit,
-    private val onCardClick: (UserRepo) -> Unit,
+    private val onShareClick: (String) -> Unit,
+    private val onCardClick: (String) -> Unit,
 ) : ListAdapter<UserRepo, RepositoryViewHolder>(diffCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepositoryViewHolder {
