@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
             val userName = binding.etUserName.text.toString().trimEnd()
             if (userName.isNotBlank()) {
                 viewModel.search(userName)
+                binding.pbLoading.isVisible = true
             } else {
                 displayOnSnackBar(getString(R.string.enter_username))
             }
@@ -64,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun collect(uiState: UiState) {
         when (uiState) {
-            UiState.EmptyList -> { /* show loading*/ }
+            UiState.EmptyList -> { /* TODO(Add empty view) */ }
             is UiState.Error -> errorState(uiState)
             is UiState.Success -> setupAdapter(uiState.repoList)
         }
@@ -77,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             ErrorEntity.ServiceUnavailable -> R.string.service_unavailable_message
             ErrorEntity.Unknown -> R.string.unknown_error_message
         }
+        binding.pbLoading.isVisible = false
         displayOnSnackBar(getString(message))
     }
 
@@ -86,6 +89,7 @@ class MainActivity : AppCompatActivity() {
             setHasFixedSize(true)
         }
         repoAdapter.submitList(list)
+        binding.pbLoading.isVisible = false
     }
 
     private fun shareRepositoryLink(urlRepository: String) {
