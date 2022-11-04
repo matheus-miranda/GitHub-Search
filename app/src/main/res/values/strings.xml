@@ -10,4 +10,5 @@
     <string name="user_not_found_message">User not found, please try again</string>
     <string name="service_unavailable_message">Service unavailable, please try again later</string>
     <string name="unknown_error_message">We are working to fix this, please try again later</string>
+    <string name="share_icon">Share repository</string>
 </resources>
