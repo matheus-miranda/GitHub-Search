@@ -14,6 +14,7 @@ import br.com.igorbag.githubsearch.databinding.ActivityMainBinding
 import br.com.igorbag.githubsearch.domain.error.ErrorEntity
 import br.com.igorbag.githubsearch.domain.model.UserRepo
 import br.com.igorbag.githubsearch.ui.adapter.RepositoryAdapter
+import br.com.igorbag.githubsearch.ui.util.hideKeyboard
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -30,16 +31,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        showUserName()
         setupListeners()
         getAllReposByUserName()
+        showUserName()
     }
 
     private fun setupListeners() {
         binding.btnConfirm.setOnClickListener {
             val userName = binding.etUserName.text.toString().trimEnd()
             if (userName.isNotBlank()) {
+                saveUserNameToStorage(userName)
                 viewModel.search(userName)
+                hideKeyboard(it)
                 binding.pbLoading.isVisible = true
             } else {
                 displayOnSnackBar(getString(R.string.enter_username))
@@ -47,13 +50,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // salvar o usuario preenchido no EditText utilizando uma SharedPreferences
-    private fun saveUserLocal() {
-        //@TODO 3 - Persistir o usuario preenchido na editText com a SharedPref no listener do botao salvar
+    private fun saveUserNameToStorage(userName: String) {
+        viewModel.saveUserName(userName)
     }
 
     private fun showUserName() {
-        //@TODO 4- depois de persistir o usuario exibir sempre as informacoes no EditText  se a sharedpref possuir algum valor, exibir no proprio editText o valor salvo
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.savedUserName.collect { userName ->
+                    binding.etUserName.setText(userName)
+                }
+            }
+        }
     }
 
     private fun getAllReposByUserName() {
