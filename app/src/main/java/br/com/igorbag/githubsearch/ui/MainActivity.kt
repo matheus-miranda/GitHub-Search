@@ -3,40 +3,49 @@ package br.com.igorbag.githubsearch.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import br.com.igorbag.githubsearch.R
-import br.com.igorbag.githubsearch.data.network.GitHubService
+import br.com.igorbag.githubsearch.databinding.ActivityMainBinding
+import br.com.igorbag.githubsearch.domain.error.ErrorEntity
 import br.com.igorbag.githubsearch.domain.model.UserRepo
+import br.com.igorbag.githubsearch.ui.adapter.RepositoryAdapter
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    lateinit var nomeUsuario: EditText
-    lateinit var btnConfirmar: Button
-    lateinit var listaRepositories: RecyclerView
-    lateinit var githubApi: GitHubService
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val viewModel: MainViewModel by viewModels()
+    private val repoAdapter by lazy {
+        RepositoryAdapter(onShareClick = ::shareRepositoryLink, onCardClick = ::openBrowser)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setupView()
+        setContentView(binding.root)
         showUserName()
-        setupRetrofit()
+        setupListeners()
         getAllReposByUserName()
     }
 
-    // Metodo responsavel por realizar o setup da view e recuperar os Ids do layout
-    fun setupView() {
-        //@TODO 1 - Recuperar os Id's da tela para a Activity com o findViewById
-    }
-
-    //metodo responsavel por configurar os listeners click da tela
     private fun setupListeners() {
-        //@TODO 2 - colocar a acao de click do botao confirmar
+        binding.btnConfirm.setOnClickListener {
+            val userName = binding.etUserName.text.toString().trimEnd()
+            if (userName.isNotBlank()) {
+                viewModel.search(userName)
+                binding.pbLoading.isVisible = true
+            } else {
+                displayOnSnackBar(getString(R.string.enter_username))
+            }
+        }
     }
-
 
     // salvar o usuario preenchido no EditText utilizando uma SharedPreferences
     private fun saveUserLocal() {
@@ -47,33 +56,43 @@ class MainActivity : AppCompatActivity() {
         //@TODO 4- depois de persistir o usuario exibir sempre as informacoes no EditText  se a sharedpref possuir algum valor, exibir no proprio editText o valor salvo
     }
 
-    //Metodo responsavel por fazer a configuracao base do Retrofit
-    fun setupRetrofit() {
-        /*
-           @TODO 5 -  realizar a Configuracao base do retrofit
-           Documentacao oficial do retrofit - https://square.github.io/retrofit/
-           URL_BASE da API do  GitHub= https://api.github.com/
-           lembre-se de utilizar o GsonConverterFactory mostrado no curso
-        */
+    private fun getAllReposByUserName() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect(::collect)
+            }
+        }
     }
 
-    //Metodo responsavel por buscar todos os repositorios do usuario fornecido
-    fun getAllReposByUserName() {
-        // TODO 6 - realizar a implementacao do callback do retrofit e chamar o metodo setupAdapter se retornar os dados com sucesso
+    private fun collect(uiState: UiState) {
+        when (uiState) {
+            UiState.EmptyList -> { /* TODO(Add empty view) */ }
+            is UiState.Error -> errorState(uiState)
+            is UiState.Success -> setupAdapter(uiState.repoList)
+        }
     }
 
-    // Metodo responsavel por realizar a configuracao do adapter
-    fun setupAdapter(list: List<UserRepo>) {
-        /*
-            @TODO 7 - Implementar a configuracao do Adapter , construir o adapter e instancia-lo
-            passando a listagem dos repositorios
-         */
+    private fun errorState(uiState: UiState.Error) {
+        val message = when (uiState.error) {
+            ErrorEntity.Network -> R.string.network_error_message
+            ErrorEntity.NotFound -> R.string.user_not_found_message
+            ErrorEntity.ServiceUnavailable -> R.string.service_unavailable_message
+            ErrorEntity.Unknown -> R.string.unknown_error_message
+        }
+        binding.pbLoading.isVisible = false
+        displayOnSnackBar(getString(message))
     }
 
+    private fun setupAdapter(list: List<UserRepo>) {
+        binding.rvRepositoryList.apply {
+            adapter = repoAdapter
+            setHasFixedSize(true)
+        }
+        repoAdapter.submitList(list)
+        binding.pbLoading.isVisible = false
+    }
 
-    // Metodo responsavel por compartilhar o link do repositorio selecionado
-    // @Todo 11 - Colocar esse metodo no click do share item do adapter
-    fun shareRepositoryLink(urlRepository: String) {
+    private fun shareRepositoryLink(urlRepository: String) {
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, urlRepository)
@@ -84,17 +103,16 @@ class MainActivity : AppCompatActivity() {
         startActivity(shareIntent)
     }
 
-    // Metodo responsavel por abrir o browser com o link informado do repositorio
-
-    // @Todo 12 - Colocar esse metodo no click item do adapter
-    fun openBrowser(urlRepository: String) {
+    private fun openBrowser(urlRepository: String) {
         startActivity(
             Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(urlRepository)
             )
         )
-
     }
 
+    private fun displayOnSnackBar(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
 }

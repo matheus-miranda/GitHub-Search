@@ -1,5 +1,15 @@
 <resources>
-    <string name="app_name">GitHubSearch</string>
-    <string name="nome_usuario">Nome do usuário</string>
-    <string name="confirmar">Confirmar</string>
+    <string name="app_name">GitHub Search</string>
+
+    <!-- MainActivity -->
+    <string name="user_name">User name</string>
+    <string name="confirm">Confirm</string>
+    <string name="share_icon">Share repository</string>
+    <string name="enter_username">Please enter a username</string>
+
+    <!-- Error messages -->
+    <string name="network_error_message">Please check your internet connection</string>
+    <string name="user_not_found_message">User not found, please try again</string>
+    <string name="service_unavailable_message">Service unavailable, please try again later</string>
+    <string name="unknown_error_message">We are working to fix this, please try again later</string>
 </resources>
