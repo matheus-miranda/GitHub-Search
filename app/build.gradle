@@ -71,4 +71,8 @@ dependencies {
 
     // DataStore
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
+
+    // Paging3
+    def paging_version = '3.1.1'
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version"
 }
