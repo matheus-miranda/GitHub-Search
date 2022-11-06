@@ -1,10 +1,10 @@
 package br.com.igorbag.githubsearch.ui
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import br.com.igorbag.githubsearch.domain.ResultStatus
-import br.com.igorbag.githubsearch.domain.error.ErrorEntity
-import br.com.igorbag.githubsearch.domain.model.UserRepo
+import androidx.paging.cachedIn
 import br.com.igorbag.githubsearch.domain.repository.StorageRepository
 import br.com.igorbag.githubsearch.domain.repository.UserRepoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,29 +20,18 @@ class MainViewModel @Inject constructor(
     private val storageRepository: StorageRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<UiState>(UiState.EmptyList)
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
-
-    private val _savedUserName = MutableStateFlow("")
-    val savedUserName: StateFlow<String> = _savedUserName.asStateFlow()
-
-    private var _showSnackBar = MutableStateFlow(false)
-    val showSnackBar: StateFlow<Boolean> = _showSnackBar.asStateFlow()
-
     init {
         retrieveSavedUserName()
     }
 
+    private val _savedUserName = MutableStateFlow("")
+    val savedUserName: StateFlow<String> = _savedUserName.asStateFlow()
+
+    private val _currentUserName = MutableLiveData("")
+    val repoListData = _currentUserName.switchMap { repository.fetchRepoList(it).cachedIn(viewModelScope) }
+
     fun search(username: String) {
-        viewModelScope.launch {
-            repository.fetchRepoList(username).collect { result ->
-                when (result) {
-                    ResultStatus.Loading -> _uiState.value = UiState.EmptyList
-                    is ResultStatus.Error -> _uiState.value = UiState.Error(result.error)
-                    is ResultStatus.Success -> _uiState.value = UiState.Success(result.data)
-                }
-            }
-        }
+        _currentUserName.value = username
     }
 
     fun saveUserName(username: String) {
@@ -58,18 +47,4 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
-    fun doneShowingSnackBar() {
-        _showSnackBar.value = false
-    }
-
-    fun resetSnackBarValue() {
-        _showSnackBar.value = true
-    }
-}
-
-sealed class UiState {
-    object EmptyList : UiState()
-    data class Success(val repoList: List<UserRepo> = emptyList()) : UiState()
-    data class Error(val error: ErrorEntity) : UiState()
 }
