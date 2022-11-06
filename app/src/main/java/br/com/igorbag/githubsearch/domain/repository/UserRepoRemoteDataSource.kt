@@ -1,9 +1,7 @@
 package br.com.igorbag.githubsearch.domain.repository
 
-import br.com.igorbag.githubsearch.domain.ResultStatus
-import br.com.igorbag.githubsearch.domain.model.UserRepo
-import kotlinx.coroutines.flow.Flow
+import br.com.igorbag.githubsearch.domain.model.UserRepoPaging
 
 interface UserRepoRemoteDataSource {
-    fun fetchRepoList(username: String): Flow<ResultStatus<List<UserRepo>>>
+    suspend fun fetchRepoList(username: String, page: Int): UserRepoPaging
 }
