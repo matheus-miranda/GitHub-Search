@@ -4,16 +4,14 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import br.com.igorbag.githubsearch.R
 import br.com.igorbag.githubsearch.databinding.ActivityMainBinding
-import br.com.igorbag.githubsearch.domain.error.ErrorEntity
-import br.com.igorbag.githubsearch.domain.model.UserRepo
 import br.com.igorbag.githubsearch.ui.adapter.RepositoryAdapter
 import br.com.igorbag.githubsearch.ui.util.hideKeyboard
 import com.google.android.material.snackbar.Snackbar
@@ -32,19 +30,28 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setupListeners()
+        bindRecyclerView()
+        bindListeners()
         getAllReposByUserName()
+        showLoadingIndicators()
         showUserName()
     }
 
-    private fun setupListeners() {
+    private fun bindRecyclerView() {
+        binding.rvRepositoryList.apply {
+            adapter = repoAdapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun bindListeners() {
         binding.btnConfirm.setOnClickListener {
             val userName = binding.etUserName.text.toString().trimEnd()
             if (userName.isNotBlank()) {
+                binding.pbLoading.isVisible = true
                 saveUserNameToStorage(userName)
                 viewModel.search(userName)
                 hideKeyboard(it)
-                binding.pbLoading.isVisible = true
             } else {
                 binding.etUserName.error = getString(R.string.enter_username)
             }
@@ -66,53 +73,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getAllReposByUserName() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect(::collect)
+        viewModel.repoListData.observe(this) {
+            val userName = binding.etUserName.text.toString()
+            if (userName.isNotBlank()) {
+                repoAdapter.submitData(this.lifecycle, it)
+                binding.pbLoading.isVisible = false
             }
         }
     }
 
-    private fun collect(uiState: UiState) {
-        when (uiState) {
-            UiState.EmptyList -> { /* TODO(Add empty view) */ }
-            is UiState.Error -> errorState(uiState)
-            is UiState.Success -> setupAdapter(uiState.repoList)
-        }
-    }
-
-    private fun errorState(uiState: UiState.Error) {
-        val message = when (uiState.error) {
-            ErrorEntity.Network -> R.string.network_error_message
-            ErrorEntity.NotFound -> R.string.user_not_found_message
-            ErrorEntity.ServiceUnavailable -> R.string.service_unavailable_message
-            ErrorEntity.Unknown -> R.string.unknown_error_message
-        }
-        manageSnackBarStateAndShow(message)
-        viewModel.resetSnackBarValue()
-        binding.pbLoading.isVisible = false
-    }
-
-    private fun manageSnackBarStateAndShow(@StringRes message: Int) {
+    private fun showLoadingIndicators() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.showSnackBar.collect { shouldShowSnackBar ->
-                    if (shouldShowSnackBar) {
-                        displayOnSnackBar(getString(message))
-                        viewModel.doneShowingSnackBar()
+                repoAdapter.loadStateFlow.collect { combinedLoadStates ->
+                    val userName = binding.etUserName.text.toString()
+                    if (userName.isNotBlank()) {
+                        binding.pbPrepend.isVisible = combinedLoadStates.source.prepend is LoadState.Loading
+                        binding.pbAppend.isVisible = combinedLoadStates.source.append is LoadState.Loading
+                        binding.pbLoading.isVisible = combinedLoadStates.source.refresh is LoadState.Loading
+                        if (combinedLoadStates.refresh is LoadState.Error)
+                            displayOnSnackBar(getString(R.string.generic_error_message))
                     }
                 }
             }
         }
-    }
-
-    private fun setupAdapter(list: List<UserRepo>) {
-        binding.rvRepositoryList.apply {
-            adapter = repoAdapter
-            setHasFixedSize(true)
-        }
-        repoAdapter.submitList(list)
-        binding.pbLoading.isVisible = false
     }
 
     private fun shareRepositoryLink(urlRepository: String) {
