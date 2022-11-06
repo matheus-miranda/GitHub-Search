@@ -9,4 +9,5 @@
     <string name="unknown_error_message">Estamos consertando o erro, por favor tente mais tarde</string>
     <string name="share_icon">Compartilhar repositório</string>
     <string name="enter_username">Por favor digite um usuário</string>
+    <string name="generic_error_message">Erro ao buscar os dados, o usuário existe?</string>
 </resources>
