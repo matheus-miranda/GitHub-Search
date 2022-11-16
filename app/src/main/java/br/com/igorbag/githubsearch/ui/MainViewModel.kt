@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun retrieveSavedUserName() {
+    fun retrieveSavedUserName() {
         viewModelScope.launch {
             storageRepository.getUser().collect {
                 _savedUserName.value = it

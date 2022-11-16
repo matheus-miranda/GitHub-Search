@@ -12,6 +12,8 @@ import io.mockk.every
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
@@ -53,5 +55,16 @@ class MainViewModelTest {
         val result = viewModel.repoListData
 
         assertNotNull(result)
+    }
+
+    @Test
+    fun `when searching for a user name, then should save it`() = runTest {
+        val testUser = "user"
+        every { storageRepository.getUser() } returns flowOf(testUser)
+
+        viewModel.saveUserName(String())
+        viewModel.retrieveSavedUserName()
+
+        assertEquals("user", viewModel.savedUserName.value)
     }
 }
