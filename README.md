@@ -1,7 +1,7 @@
 # Github Search
 [Digital Innovation One](https://www.dio.me/en) challenge for sharing your GitHub portfolio. 
 
-Built with Clean Architecture, using Repository pattern with a local datasource (for DataStore) and remote (for Retrofit). Hilt for depedency injection.
+Built with Clean Architecture, using Repository pattern with a local datasource (for DataStore) and remote (for Retrofit). Hilt for depedency injection and unit tests for the ViewModel and PagingSource.
 
 ## App capabilities:
 - Search all users from Github
@@ -17,6 +17,7 @@ Built with Clean Architecture, using Repository pattern with a local datasource 
 - Paging3
 - Dagger-Hilt
 - OkHttp/Retrofit
+- Mockk
 
 [GitHub API](https://docs.github.com/en/rest) - Limitation: 60 searches per hour
 
